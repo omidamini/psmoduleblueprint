@@ -1,0 +1,4 @@
+psmoduleblueprint_configure:
+  path: /configure
+  controller: Blueprint\Module\Psmoduleblueprint\Controller\ModuleConfigController::configureAction
+  methods: [GET, POST]

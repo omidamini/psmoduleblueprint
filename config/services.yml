@@ -1,0 +1,31 @@
+services:
+      _defaults:
+            public: true
+            autowire: true
+            autoconfigure: true
+      Blueprint\Module\Psmoduleblueprint\Service\ModuleEntityService:
+            class: Blueprint\Module\Psmoduleblueprint\Service\ModuleEntityService
+            public: true
+            autowire: true
+      psmoduleblueprint.logger:
+        class: Monolog\Logger
+        public: true
+        arguments:
+            - 'psmoduleblueprint'  # Nom du logger
+        calls:
+            - method: pushHandler
+              arguments:
+                  - '@psmoduleblueprint.logger.handler'
+      Blueprint\Module\Psmoduleblueprint\Service\LoggerService:
+            class: Blueprint\Module\Psmoduleblueprint\Service\LoggerService
+            public: true
+            autowire: true
+            autoconfigure: true
+            arguments:
+                $logger: '@psmoduleblueprint.logger'
+      psmoduleblueprint.logger.handler:
+        class: Monolog\Handler\RotatingFileHandler
+        arguments:
+            - '%kernel.project_dir%/../var/logs/psmoduleblueprint.log'
+            - 10  # Nombre de fichiers de rotation, Les fichiers de rotation seront numérotés de 1 à 10. Au-delà de 10 fichiers, les plus anciens seront automatiquement supprimés
+            - 5242880  # Taille maximale du fichier en octets (5MB)

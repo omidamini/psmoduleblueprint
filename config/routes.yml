@@ -1,0 +1,7 @@
+_config_routing:
+  resource: "routes/admin/config/_config.yml"
+  prefix: /psmoduleblueprint/admin/config
+
+
+
+    

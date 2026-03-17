@@ -1,0 +1,13 @@
+services:
+      _defaults:
+            public: true
+            autowire: true
+            autoconfigure: true
+      Blueprint\Module\Psmoduleblueprint\Controller\ModuleConfigController:
+            class: Blueprint\Module\Psmoduleblueprint\Controller\ModuleConfigController
+            public: true
+            arguments:
+                  - '@request_stack'
+                  - '@Blueprint\Module\Psmoduleblueprint\Service\FormService'
+                  - '@Blueprint\Module\Psmoduleblueprint\Service\ModuleEntityService'
+                  - '@translator'

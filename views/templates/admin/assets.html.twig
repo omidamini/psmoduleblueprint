@@ -1,0 +1,10 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('../modules/psmoduleblueprint/views/css/admin.css') }}" type="text/css" media="all">
+    
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('../modules/psmoduleblueprint/views/js/admin.js') }}"></script>
+{% endblock %}

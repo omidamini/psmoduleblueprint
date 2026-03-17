@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        public: true
+        autowire: true
+        autoconfigure: true
+
+    Blueprint\Module\Psmoduleblueprint\Service\FormService:
+        class: Blueprint\Module\Psmoduleblueprint\Service\FormService
+        public: true
+        arguments:
+                - '@request_stack'
+                - '@doctrine.orm.entity_manager'
+                - '@form.factory'
+                - '@session.factory'
+                - '@router'
+                - '@translator'
+    Blueprint\Module\Psmoduleblueprint\Service\ConfigService:
+        class: Blueprint\Module\Psmoduleblueprint\Service\ConfigService
+        public: true
+        arguments:
+                - '@doctrine.orm.entity_manager'

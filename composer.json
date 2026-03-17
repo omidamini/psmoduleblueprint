@@ -1,0 +1,34 @@
+{
+    "name": "ps/psmoduleblueprint",
+    "description": "ps module blueprint",
+    "type": "prestashop-module",
+    "authors": [
+        {
+            "name": "Omid AMINI",
+            "email": "bcs.omid@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "license": "OSL-3.0",
+    "require": {
+        "php": ">=8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Blueprint\\Module\\Psmoduleblueprint\\": "src/"
+        },
+        "classmap": [
+            "psmoduleblueprint.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Blueprint\\Module\\Psmoduleblueprint\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "prepend-autoloader": false
+    },
+    "minimum-stability": "stable"
+}
