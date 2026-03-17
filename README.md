@@ -1,6 +1,6 @@
 # PrestaShop Module Blueprint
 
-![PrestaShop](https://img.shields.io/badge/PrestaShop-1.8+-blue.svg)
+![PrestaShop](https://img.shields.io/badge/PrestaShop-8.0+-blue.svg)
 ![PHP](https://img.shields.io/badge/PHP-8.0+-purple.svg)
 ![License](https://img.shields.io/badge/license-OSL3.0-red.svg)
 
@@ -63,7 +63,7 @@ psmoduleblueprint/
 
 ### Prerequisites
 
-- PrestaShop 1.8 or higher
+- PrestaShop 8.0 or higher
 - PHP 8.0 or higher
 - Composer
 
@@ -261,6 +261,6 @@ Check `src/Install/Database/` classes for schema definitions.
 ---
 
 **Version**: 1.0.0  
-**Compatible with**: PrestaShop 1.8+  
+**Compatible with**: PrestaShop 8.0+  
 **Last Updated**: March 2026
 

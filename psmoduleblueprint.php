@@ -31,7 +31,7 @@ class Psmoduleblueprint extends Module
         $this->author = 'Omid AMINI';
         $this->need_instance = 0;
         $this->bootstrap = true;
-        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '8.0', 'max' => _PS_VERSION_);
         parent::__construct();
         $this->displayName = $this->l('ps module blueprint');
         $this->description = $this->l('Integrates ps module blueprint into your PrestaShop store.');
