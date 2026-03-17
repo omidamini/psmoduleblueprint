@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionFactory;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Tools;
@@ -26,17 +26,15 @@ class FormService
     private $data;
     private $handleFormSubmission;
     private $form;
-    private $session;
     public function __construct(
         private RequestStack $requestStack,
         private EntityManagerInterface $entityManager,
         private FormFactory $formFactory,
-        private SessionFactory $sessionFactory,
+        private Session $session,
         private RouterInterface $router,
         private TranslatorInterface $translator,
     ) 
     {
-        $this->session = $this->sessionFactory->createSession();
 
     }
 

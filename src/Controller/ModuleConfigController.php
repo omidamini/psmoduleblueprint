@@ -12,11 +12,11 @@ use Blueprint\Module\Psmoduleblueprint\Config\ModuleConfig;
 use Blueprint\Module\Psmoduleblueprint\Service\FormService;
 use Blueprint\Module\Psmoduleblueprint\Service\ModuleEntityService;
 use Blueprint\Module\Psmoduleblueprint\Form\ModuleSearchForm;
-use PrestaShopBundle\Controller\Admin\PrestaShopAdminController;
+use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
-class ModuleConfigController extends PrestaShopAdminController
+class ModuleConfigController extends FrameworkBundleAdminController
 {
     public function __construct(private RequestStack $requestStack, private FormService $formService, private ModuleEntityService $moduleEntityService, private TranslatorInterface $translator)
     {

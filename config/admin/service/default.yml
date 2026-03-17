@@ -11,7 +11,7 @@ services:
                 - '@request_stack'
                 - '@doctrine.orm.entity_manager'
                 - '@form.factory'
-                - '@session.factory'
+                - '@session'
                 - '@router'
                 - '@translator'
     Blueprint\Module\Psmoduleblueprint\Service\ConfigService:
