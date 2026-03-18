@@ -87,7 +87,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to snake_case (itis_module_blueprint)
+     * Convert to snake_case (ps_module_blueprint)
      */
     public static function toSnakeCase(string $str): string
     {
@@ -103,7 +103,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to UPPER_SNAKE_CASE (ITIS_MODULE_BLUEPRINT)
+     * Convert to UPPER_SNAKE_CASE (PS_MODULE_BLUEPRINT)
      */
     public static function toUpperSnakeCase(string $str): string
     {
