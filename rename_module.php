@@ -9,9 +9,10 @@
  * Usage:
  *   php rename_module.php [directory_path]
  * 
- * @author  PrestaShop Developer
+ * @author  Omid AMINI
+ * @link    https://www.linkedin.com/in/omid-amini/
  * @version 2.0.0
- * @license MIT
+ * @license OSL
  */
 /**
  *Features
@@ -87,7 +88,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to snake_case (itis_module_blueprint)
+     * Convert to snake_case (ps_module_blueprint)
      */
     public static function toSnakeCase(string $str): string
     {
@@ -103,7 +104,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to UPPER_SNAKE_CASE (ITIS_MODULE_BLUEPRINT)
+     * Convert to UPPER_SNAKE_CASE (PS_MODULE_BLUEPRINT)
      */
     public static function toUpperSnakeCase(string $str): string
     {
@@ -111,7 +112,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to kebab-case (module-blueprint)
+     * Convert to kebab-case (ps-module-blueprint)
      */
     public static function toKebabCase(string $str): string
     {
@@ -119,7 +120,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to space separated lowercase (module blueprint)
+     * Convert to space separated lowercase (ps module blueprint)
      */
     public static function toSpaceLowerCase(string $str): string
     {
@@ -127,7 +128,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to Title Case With Spaces (Module Blue Print)
+     * Convert to Title Case With Spaces (Ps Module Blueprint)
      */
     public static function toTitleCase(string $str): string
     {
@@ -135,7 +136,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to Sentence case (Module blueprint)
+     * Convert to Sentence case (Ps module blueprint)
      */
     public static function toSentenceCase(string $str): string
     {
@@ -143,7 +144,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to UPPER CASE WITH SPACES (MODULE BLUEPRINT)
+     * Convert to UPPER CASE WITH SPACES (PS MODULE BLUEPRINT)
      */
     public static function toUpperSpaceCase(string $str): string
     {
@@ -151,7 +152,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to slash separated Title Case (Module/Blue/Print)
+     * Convert to slash separated Title Case (Ps/Module/Blueprint)
      */
     public static function toSlashTitleCase(string $str): string
     {
@@ -161,7 +162,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to slash with PascalCase (Module/BluePrint)
+     * Convert to slash with PascalCase (Ps/Module/BluePrint)
      */
     public static function toSlashPascalCase(string $str): string
     {
@@ -179,7 +180,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to slash lowercase (module/blueprint)
+     * Convert to slash lowercase (ps/module/blueprint)
      */
     public static function toSlashLowerCase(string $str): string
     {
@@ -188,7 +189,7 @@ final class CaseConverter
     }
     
     /**
-     * Convert to slash with first word capitalized (Module/blueprint)
+     * Convert to slash with first word capitalized (Ps/module/blueprint)
      */
     public static function toSlashSentenceCase(string $str): string
     {

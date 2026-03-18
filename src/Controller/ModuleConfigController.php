@@ -3,7 +3,6 @@
  * @author Omid AMINI
  * @link https://www.linkedin.com/in/omid-amini/
  * @license OSL 3.0
- * @copyright 2026 ITIS COMMERCE (https://www.itis-commerce.com/)
  */
 declare(strict_types=1);
 namespace Blueprint\Module\Psmoduleblueprint\Controller;
@@ -24,7 +23,7 @@ class ModuleConfigController extends PrestaShopAdminController
      public function configureAction(): Response
     {
         $searchForm = $this->createForm(ModuleSearchForm::class, null, [
-            #'action' => $this->generateUrl('itis_customerservice_sparepart', ['id' => $id])
+            #'action' => $this->generateUrl('psmoduleblueprint_route_name', ['id' => $id])
         ]);
         $welcome_msg = 'Hello PrestaShop!';
         return $this->render('@Modules/psmoduleblueprint/views/templates/admin/config/index.html.twig', [
