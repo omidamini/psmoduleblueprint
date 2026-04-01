@@ -32,8 +32,9 @@ class Psmoduleblueprint extends Module
         $this->bootstrap = true;
         $this->ps_versions_compliancy = array('min' => '9.0', 'max' => _PS_VERSION_);
         parent::__construct();
-        $this->displayName = $this->l('ps module blueprint');
-        $this->description = $this->l('Integrates ps module blueprint into your PrestaShop store.');
+        $this->displayName = $this->trans('ps module blueprint', [], 'Modules.Psmoduleblueprint.Module');
+        $this->description = $this->trans('Integrates ps module blueprint into your PrestaShop store.', [], 'Modules.Psmoduleblueprint.Module');
+        $this->confirmUninstall = $this->trans('Are you sure you want to uninstall?', [], 'Modules.Psmoduleblueprint.Module');
     }
     public function getLoggerService(): ?LoggerService
     {

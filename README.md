@@ -70,23 +70,24 @@ psmoduleblueprint/
 ### Method 1: Direct Installation
 
 1. **Download/Clone** the module to your PrestaShop modules directory:
+
    ```bash
    cd /path/to/prestashop/modules/
    git clone <repository-url> psmoduleblueprint
    ```
-
 2. **Install Composer Dependencies**:
+
    ```bash
    cd psmoduleblueprint
    composer install
    ```
-
 3. **Regenerate Autoloader** (if you make changes to the structure):
+
    ```bash
    composer dump-autoload
    ```
-
 4. **Install via PrestaShop Back-Office**:
+
    - Navigate to **Modules > Module Manager**
    - Search for "ps module blueprint"
    - Click **Install**
@@ -96,27 +97,28 @@ psmoduleblueprint/
 To use this as a template for your own module:
 
 1. **Copy the module directory**:
+
    ```bash
    cp -r psmoduleblueprint /path/to/prestashop/modules/yournewmodule
    cd /path/to/prestashop/modules/yournewmodule
    ```
-
 2. **Run the rename script**:
+
    ```bash
    php rename_module.php
    ```
-   
+
    The script will:
+
    - Prompt for a new module name
    - Automatically rename files, classes, and namespaces
    - Update all references throughout the codebase
    - Support 14+ different naming conventions (PascalCase, camelCase, snake_case, etc.)
-
 3. **Install dependencies**:
+
    ```bash
    composer install
    ```
-
 4. **Install the module** in PrestaShop back-office
 
 ## 🔧 Configuration
@@ -132,10 +134,11 @@ After installation, configure the module:
 ### Adding a New Hook
 
 1. Create a hook class in `src/Hook/`:
+
    ```php
    <?php
    namespace Blueprint\Module\Psmoduleblueprint\Hook;
-   
+
    class YourCustomHook extends Hook
    {
        public function run(): string
@@ -145,10 +148,9 @@ After installation, configure the module:
        }
    }
    ```
-
 2. Register the hook in `src/Install/Hook/HooksList.php`
-
 3. Add the hook method in `psmoduleblueprint.php`:
+
    ```php
    public function hookYourHookName($params)
    {
@@ -186,12 +188,12 @@ composer dump-autoload -o
 
 ## 📝 Composer Commands
 
-| Command | Description |
-|---------|-------------|
-| `composer install` | Install all dependencies (first time setup) |
-| `composer update` | Update dependencies to latest versions |
-| `composer dump-autoload` | Regenerate autoload files |
-| `composer dump-autoload -o` | Regenerate with optimization (production) |
+| Command                       | Description                                 |
+| ----------------------------- | ------------------------------------------- |
+| `composer install`          | Install all dependencies (first time setup) |
+| `composer update`           | Update dependencies to latest versions      |
+| `composer dump-autoload`    | Regenerate autoload files                   |
+| `composer dump-autoload -o` | Regenerate with optimization (production)   |
 
 ## 🔍 Available Hooks
 
@@ -226,9 +228,9 @@ vendor/bin/phpunit
 ## 👤 Author
 
 **Omid AMINI**
+
 - LinkedIn: [omid-amini](https://www.linkedin.com/in/omid-amini/)
 - Email: bcs.omid@gmail.com
-
 
 ## 📜 License
 
@@ -241,15 +243,19 @@ This module blueprint is open source under OSL 3.0 license. Contributions are we
 ## 🐛 Troubleshooting
 
 ### Autoload errors
+
 Run `composer dump-autoload` to regenerate class mappings.
 
 ### Module not appearing
+
 Ensure the module folder name matches the class name (case-sensitive).
 
 ### Service not found
+
 Check `config/services.yml` and verify service definitions.
 
 ### Database errors
+
 Check `src/Install/Database/` classes for schema definitions.
 
 ## 📚 Additional Resources
@@ -260,7 +266,6 @@ Check `src/Install/Database/` classes for schema definitions.
 
 ---
 
-**Version**: 1.0.0  
-**Compatible with**: PrestaShop 9.0+  
+**Version**: 1.0.2
+**Compatible with**: PrestaShop 9.0+
 **Last Updated**: March 2026
-

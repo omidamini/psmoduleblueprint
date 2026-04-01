@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="src/Controller/ModuleCategoryController.php" source-language="en" target-language="fr" datatype="plaintext">
+    <body>
+      <trans-unit id="5af5e043d67aea442263ca52923bfd76">
+        <source>Configuration saved successfully.</source>
+        <target state="final">Configuration enregistrée avec succès.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5af5e043d66aea442263ca52923bfd76">
+        <source>Configuration deleted successfully.</source>
+        <target state="final">Configuration supprimée avec succès.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5af5e043d68aea442263ca52923bfd76">
+        <source>Configuration not found.</source>
+        <target state="final">Configuration non trouvée.</target>
+        <note>Line: </note>
+      </trans-unit>
+      <trans-unit id="5af5e043d69aea442263ca52923bfd76">
+        <source>Configuration already exists.</source>
+        <target state="final">La configuration existe déjà.</target>
+        <note>Line: </note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

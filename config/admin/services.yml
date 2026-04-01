@@ -2,6 +2,7 @@ imports:
     - { resource: '../services.yml' }
     - { resource: 'controller/default.yml' }
     - { resource: 'service/default.yml' }
+    - { resource: 'form/default.yml' }
 services:
       _defaults:
             public: true
