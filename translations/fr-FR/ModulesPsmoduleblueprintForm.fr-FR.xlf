@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="src/Form/ModuleSearchForm.php" source-language="en" target-language="fr" datatype="plaintext">
+    <body>
+      <trans-unit id="search_by_name_reference_or_id">
+        <source>Search by name, reference or ID</source>
+        <target state="final">Rechercher par nom, référence ou ID</target>
+        <note>Line: Search form placeholder</note>
+      </trans-unit>
+      <trans-unit id="search">
+        <source>Search</source>
+        <target state="final">Rechercher</target>
+        <note>Line: Search button label</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

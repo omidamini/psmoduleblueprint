@@ -1,0 +1,12 @@
+services:
+      _defaults:
+            public: true
+            autowire: true
+            autoconfigure: true
+      Blueprint\Module\Psmoduleblueprint\Form\ModuleSearchForm:
+              class: Blueprint\Module\Psmoduleblueprint\Form\ModuleSearchForm
+              public: true
+              arguments:
+                  $translator: '@translator'
+              tags:
+                  - { name: form.type }
