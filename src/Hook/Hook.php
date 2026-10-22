@@ -5,83 +5,82 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Hook;
-/**
- * Class Hook
- * @package Blueprint\Module\Services\Hook
- *
- * This class serves as a base for all hooks.
- */
-use Module;
+
 use Context;
-class Hook {
-    /**
-     * @var Module
-     */
-    protected $module;
-    /**
-     * @var Context
-     */
-    protected $context;
-    /**
-     * @var array
-     */
-    protected $params = [];
-    /**
-     * Hook constructor.
-     *
-     * @param Module $module
-     * @param Context $context
-     */
-    public function __construct(Module $module , Context $context) {
+use Module;
+
+abstract class Hook
+{
+    protected Module $module;
+    protected Context $context;
+    protected array $params = [];
+
+    public function __construct(Module $module, Context $context)
+    {
         $this->module = $module;
         $this->context = $context;
     }
-    /**
-     * Set parameters for the hook.
-     * @param array $params
-     * @return $this
-     */
-    public function setParams(array $params): self {
+
+    abstract public function run();
+
+    public function setParams(array $params): self
+    {
         $this->params = $params;
+
         return $this;
-        
     }
-    /**
-     * Get parameters for the hook.
-     * @return array
-     */
-    public function getParams(): array {
+
+    public function getParams(): array
+    {
         return $this->params;
     }
-     /**
-     * Render a Twig template
-     *
-     * @param string $template
-     * @param array $params
-     * @return string
-     */
+
     public function render(string $template, array $params = []): string
     {
-        $twig = $this->module->get('twig'); // Récupérer le service Twig depuis le conteneur
+        $this->assertTwigTemplate($template);
+        $twig = $this->module->get('twig');
+        if (!is_object($twig) || !method_exists($twig, 'render')) {
+            throw new \RuntimeException('Twig is not available.');
+        }
+
         return $twig->render($template, $params);
     }
-    /**
-     * Display template from MODULE/views/templates/hook/
-     *
-     * @param string $template
-     * @return string
-     */ 
-    public function display(string $template, array $params = [])
+
+    public function display(string $template, array $params = []): string
     {
-        
-        if(strpos($template, '.html.twig') == true){
-           return $this->render('@Modules/'.$this->module->name.'/views/templates/hook/' . $template,$params);
+        $this->assertTemplate($template);
+
+        if (str_ends_with($template, '.html.twig')) {
+            return $this->render(
+                '@Modules/' . $this->module->name . '/views/templates/hook/' . $template,
+                $params
+            );
         }
+
         $this->context->smarty->assign($params);
+
         return $this->module->display(
-            $this->module->getLocalPath() . $this->module->name.".php",
-            '/views/templates/hook/' . $template
+            $this->module->getLocalPath() . $this->module->name . '.php',
+            $template
         );
+    }
+
+    private function assertTemplate(string $template): void
+    {
+        if (!preg_match('/^[A-Za-z0-9_-]+\.(tpl|html\.twig)$/', $template)) {
+            throw new \InvalidArgumentException('Invalid template name.');
+        }
+    }
+
+    private function assertTwigTemplate(string $template): void
+    {
+        $prefix = '@Modules/' . $this->module->name . '/views/templates/';
+        $relative = str_starts_with($template, $prefix) ? substr($template, strlen($prefix)) : '';
+
+        if ($relative === '' || str_contains($relative, '..') || !preg_match('/^[A-Za-z0-9_\/-]+\.html\.twig$/', $relative)) {
+            throw new \InvalidArgumentException('Invalid template name.');
+        }
     }
 }

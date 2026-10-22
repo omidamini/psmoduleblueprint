@@ -5,26 +5,23 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Install\Database;
-class DropSchema implements SchemaInterface{
-    
+
+class DropSchema implements SchemaInterface
+{
     use SchemaTrait;
-    /**
-     * @var array
-     */
+
     private array $tables = [];
-    public function __construct(string $schema = CreateSchema::class)
+
+    public function __construct()
     {
-        if (!class_exists($schema)) {
-            throw new \Exception('Class ' . $schema . ' does not exist');
-        }
-        $schemaInstance = new $schema();
-        if (!$schemaInstance instanceof SchemaInterface) {
-            throw new \Exception('Class ' . $schema . ' must implement SchemaInterface');
-        }
-        $schemaTables = $schemaInstance->getTables();
-        foreach ($schemaTables as $key => $query) {
-            $this->tables[$key] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . $key . '`;';
+        foreach (array_keys((new CreateSchema())->getTables()) as $key) {
+            if (!preg_match('/^[A-Za-z0-9_]+$/', (string) $key) || !preg_match('/^[A-Za-z0-9_]+$/', _DB_PREFIX_)) {
+                throw new \InvalidArgumentException('Unsafe table name.');
+            }
+
+            $this->tables[$key] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . $key . '`';
         }
     }
 }

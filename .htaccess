@@ -1,0 +1,21 @@
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+    <FilesMatch "(?i)\.(ya?ml|md|log|lock|dist|twig|neon|xml|json)$">
+        Order deny,allow
+        Deny from all
+    </FilesMatch>
+    <FilesMatch "^(rename_module\.php|composer\.json|composer\.lock)$">
+        Order deny,allow
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Apache 2.4
+<IfModule mod_authz_core.c>
+    <FilesMatch "(?i)\.(ya?ml|md|log|lock|dist|twig|neon|xml|json)$">
+        Require all denied
+    </FilesMatch>
+    <FilesMatch "^(rename_module\.php|composer\.json|composer\.lock)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>

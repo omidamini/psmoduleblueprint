@@ -5,49 +5,47 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Install\Database;
 
 use Db;
 
 class QueryManager
 {
-    /**
-     * @param \Db|null $db
-     */
     public function __construct(private ?Db $db = null)
     {
         $this->db = $db ?? Db::getInstance();
     }
-    /**
-     * @return bool
-     * @throws \Exception
-     */
-    public function executeQuery(string $schema): bool
+
+    public function execute(SchemaInterface $schema): bool
     {
-        if (!class_exists($schema)) {
-            throw new \Exception('Class ' . $schema . ' does not exist');
-        }
+        $this->db->execute('SET FOREIGN_KEY_CHECKS = 0');
 
-        $schemaInstance = new $schema();
-        if (!$schemaInstance instanceof SchemaInterface) {
-            throw new \Exception('Class ' . $schema . ' must implement SchemaInterface');
-        }
-
-        $queries = $schemaInstance->getQueries();
-        foreach ($queries as $query) {
-            if (!$this->db->execute($query)) {
-                throw new \Exception('Error executing query: ' . $query);
+        try {
+            foreach ($schema->getQueries() as $query) {
+                $this->assertSchemaStatement($query);
+                if (!$this->db->execute($query)) {
+                    throw new \RuntimeException('Schema query failed: ' . $this->db->getMsgError());
+                }
             }
+        } finally {
+            $this->db->execute('SET FOREIGN_KEY_CHECKS = 1');
         }
+
         return true;
     }
-    /**
-     * @param string $schemaClass
-     * @return QueryManager
-     */
-    public static function getInstance(?Db $db = null): QueryManager
-    {
-        return new self($db);
-    }
 
+    private function assertSchemaStatement(string $query): void
+    {
+        $statement = trim($query);
+        $withoutTerminator = rtrim($statement, " \t\n\r;");
+
+        if ($statement === '' || str_contains($withoutTerminator, ';') || str_contains($statement, "\0")) {
+            throw new \InvalidArgumentException('Multiple SQL statements are not allowed.');
+        }
+
+        if (!preg_match('/^(CREATE|ALTER|DROP|TRUNCATE|RENAME)\b/i', $withoutTerminator)) {
+            throw new \InvalidArgumentException('Only schema statements can be executed.');
+        }
+    }
 }
