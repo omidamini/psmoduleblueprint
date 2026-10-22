@@ -5,6 +5,7 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Form;
 
 use Symfony\Component\Form\AbstractType;
@@ -12,9 +13,11 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ModuleSearchForm  extends AbstractType
+class ModuleSearchForm extends AbstractType
 {
     public function __construct(
         private TranslatorInterface $translator
@@ -27,12 +30,17 @@ class ModuleSearchForm  extends AbstractType
             ->add('q', TextType::class, [
                 'label' => false,
                 'required' => false,
+                'constraints' => [
+                    new Length(['max' => 64]),
+                    new Regex(['pattern' => '/^[\p{L}\p{N} ._-]*$/u']),
+                ],
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('Search by name, reference or ID', [], 'Modules.Psmoduleblueprint.Form')
+                    'placeholder' => $this->translator->trans('Search by name, reference or ID', [], 'Modules.Psmoduleblueprint.Form'),
+                    'maxlength' => 64,
                 ],
             ])
-            ->add('rechercher', SubmitType::class, [
+            ->add('search', SubmitType::class, [
                 'label' => $this->translator->trans('Search', [], 'Modules.Psmoduleblueprint.Form'),
                 'attr' => ['class' => 'btn btn-primary'],
             ]);
@@ -40,6 +48,8 @@ class ModuleSearchForm  extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([]);
+        $resolver->setDefaults([
+            'csrf_protection' => true,
+        ]);
     }
 }

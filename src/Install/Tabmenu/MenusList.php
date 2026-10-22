@@ -5,20 +5,22 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Install\Tabmenu;
+
 class MenusList
 {
     /**
      * @var array
-     * example: 'AdminModuleClassName' => ['class_name' => 'AdminModuleClassName','module_name' => 'modulename','name' => 'tab name','parent_class_name' => 'DEFAULT']
+     * example: 'AdminModuleClassName' => ['class_name' => 'AdminModuleClassName', 'name' => 'tab name', 'parent_class_name' => 'CONFIGURE']
      */
     private $menus = [
         'AdminPsmoduleblueprintConfig' => [
-            'class_name' => 'AdminPsmoduleblueprintConfig', // The class name of the tab
-            'module_name' => 'psmoduleblueprint', // The module name
-            'name' => 'ps module blueprint', // The name of the tab
-            'parent_class_name' => 'CONFIGURE', // The parent class name, 'DEFAULT' means it will be a top-level tab
-        ]
+            'class_name' => 'AdminPsmoduleblueprintConfig',
+            'module_name' => 'psmoduleblueprint',
+            'name' => 'ps module blueprint',
+            'parent_class_name' => 'CONFIGURE',
+        ],
     ];
 
     /**

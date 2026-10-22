@@ -8,15 +8,16 @@
 use Blueprint\Module\Psmoduleblueprint\Factory\HookFactory;
 use Blueprint\Module\Psmoduleblueprint\Factory\InstallFactory;
 use Blueprint\Module\Psmoduleblueprint\Hook\ActionFrontControllerSetMediaHook;
-use Blueprint\Module\Psmoduleblueprint\Hook\DisplayCustomerAccountHook;
 use Blueprint\Module\Psmoduleblueprint\Hook\GetContentHook;
 use Blueprint\Module\Psmoduleblueprint\Install\Installer;
 use Blueprint\Module\Psmoduleblueprint\Service\LoggerService;
 
-if(!defined('_PS_VERSION_')){
+if (!defined('_PS_VERSION_')) {
     exit;
 }
+
 require_once __DIR__ . '/vendor/autoload.php';
+
 class Psmoduleblueprint extends Module
 {
     private ?Installer $installer = null;
@@ -26,116 +27,158 @@ class Psmoduleblueprint extends Module
     {
         $this->name = 'psmoduleblueprint';
         $this->tab = 'others';
-        $this->version = '1.0.0';
+        $this->version = '1.1.0';
         $this->author = 'Omid AMINI';
         $this->need_instance = 0;
         $this->bootstrap = true;
-        $this->ps_versions_compliancy = array('min' => '9.0', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = ['min' => '9.0.0', 'max' => '9.99.99'];
         parent::__construct();
         $this->displayName = $this->trans('ps module blueprint', [], 'Modules.Psmoduleblueprint.Module');
         $this->description = $this->trans('Integrates ps module blueprint into your PrestaShop store.', [], 'Modules.Psmoduleblueprint.Module');
         $this->confirmUninstall = $this->trans('Are you sure you want to uninstall?', [], 'Modules.Psmoduleblueprint.Module');
     }
+
     public function getLoggerService(): ?LoggerService
     {
-        return $this->loggerService ?? $this->get('Blueprint\Module\Psmoduleblueprint\Service\LoggerService');
-    }
-    private function getInstaller(): Installer
-    {
-        if ($this->installer === null) {
-            $this->installer = (new InstallFactory($this, Context::getContext()))->create(Installer::class);
+        if ($this->loggerService instanceof LoggerService) {
+            return $this->loggerService;
         }
-        return $this->installer;
+
+        try {
+            $service = $this->get(LoggerService::class);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($service instanceof LoggerService) {
+            $this->loggerService = $service;
+        }
+
+        return $this->loggerService;
     }
+
     public function install()
     {
         if (!parent::install()) {
             return false;
         }
-        $installer = $this->getInstaller();
 
-        if(!$installer->installHooks()) {
+        try {
+            $installer = $this->getInstaller();
+        } catch (\Throwable $throwable) {
+            $this->logThrowable('Module installation failed.', $throwable);
+            parent::uninstall();
+
             return false;
         }
-        if(!$installer->installQueries()) {
+
+        $installed = $installer->installHooks()
+            && $installer->installQueries()
+            && $installer->installTabMenus();
+
+        if (!$installed) {
+            $this->uninstall();
+
             return false;
         }
-        if(!$installer->installTabMenus()) {
-            return false;
-        }
+
         return true;
     }
+
     public function uninstall()
     {
-        if (!parent::uninstall()) {
-            return false;
+        try {
+            $installer = $this->getInstaller();
+            $installer->uninstallTabMenu();
+            $installer->uninstallQueries();
+            $installer->uninstallHooks();
+        } catch (\Throwable $throwable) {
+            $this->logThrowable('Module removal failed.', $throwable);
         }
-        $installer = $this->getInstaller();
 
-        if(!$installer->uninstallHooks()) {
-            return false;
-        }
-        if(!$installer->uninstallQueries()) {
-            return false;
-        }
-        // Unregister the tab
-        if(!$installer->uninstallTabMenu()) {
-            return false;
-        }
-        return true;
+        return parent::uninstall();
     }
-    public function hookActionFrontControllerSetMedia($params)
+
+    public function hookActionFrontControllerSetMedia(array $params)
     {
-        return (new HookFactory($this, Context::getContext()))
-                ->create(ActionFrontControllerSetMediaHook::class)
-                ->run();
-    }
-    // public function hookDisplayCustomerAccount()
-    // {
-    //     return (new HookFactory($this, Context::getContext()))
-    //             ->create(DisplayCustomerAccountHook::class)
-    //             ->run();
-    // }
-    public function getContent()
-    {
-        return (new HookFactory($this, Context::getContext()))
-            ->create(GetContentHook::class)
+        $this->hookFactory()
+            ->create(ActionFrontControllerSetMediaHook::class)
+            ->setParams($params)
             ->run();
     }
+
+    public function getContent()
+    {
+        $this->hookFactory()->create(GetContentHook::class)->run();
+    }
+
     public function isUsingNewTranslationSystem()
     {
         return true;
     }
-    /**
-    * Log an error message
-    *
-    * @param string $message The error message to log
-    */
-    public function error($message): void
+
+    public function error(string $message): void
     {
         $this->_errors[] = $message;
-        try {
-            $logger = $this->getLoggerService();
-            if ($logger) {
-                $logger->error($message);
-            }
-        } catch (\Throwable $th) {
-            file_put_contents(_PS_MODULE_DIR_.DIRECTORY_SEPARATOR.$this->name. '/psmoduleblueprint.log', $message.PHP_EOL, FILE_APPEND);
-        }
+        $this->writeLog('error', $message);
     }
-    /**
-    * confirmation message
-    */
-    public function confirmation($message): void
+
+    public function confirmation(string $message): void
     {
         $this->_confirmations[] = $message;
+        $this->writeLog('info', $message);
+    }
+
+    public function logThrowable(string $message, \Throwable $throwable): void
+    {
+        $this->_errors[] = $message;
+        $this->writeLog(
+            'error',
+            $message . ' ' . $throwable->getMessage()
+            . ' at ' . $throwable->getFile() . ':' . $throwable->getLine()
+        );
+    }
+
+    private function getInstaller(): Installer
+    {
+        if (!$this->installer instanceof Installer) {
+            $this->installer = (new InstallFactory($this))->create();
+        }
+
+        return $this->installer;
+    }
+
+    private function hookFactory(): HookFactory
+    {
+        return new HookFactory($this, $this->context);
+    }
+
+    private function writeLog(string $level, string $message): void
+    {
         try {
             $logger = $this->getLoggerService();
-            if ($logger) {
-                $logger->info($message);
+            if (!$logger instanceof LoggerService) {
+                throw new \RuntimeException('Logger is not available.');
             }
-        } catch (\Throwable $th) {
-            file_put_contents(_PS_MODULE_DIR_.DIRECTORY_SEPARATOR.$this->name. '/psmoduleblueprint.log', $message.PHP_EOL, FILE_APPEND);
+
+            if ($level === 'error') {
+                $logger->error($message);
+
+                return;
+            }
+
+            $logger->info($message);
+        } catch (\Throwable) {
+            if (class_exists(PrestaShopLogger::class)) {
+                PrestaShopLogger::addLog(
+                    '[' . $this->name . '] ' . $message,
+                    $level === 'error' ? 3 : 1,
+                    null,
+                    null,
+                    null,
+                    true
+                );
+            }
         }
     }
 }

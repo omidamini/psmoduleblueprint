@@ -4,59 +4,64 @@
  * @link https://www.linkedin.com/in/omid-amini/
  * @license OSL 3.0
  */
+declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Service;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Blueprint\Module\Psmoduleblueprint\Entity\PsmoduleblueprintConf;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ConfigService
 {
-    public function __construct(private EntityManagerInterface $entityManager) {}
-    /**
-     * Get configuration value by name.
-     *
-     * @param string $name
-     * @return string|null
-     */
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
+
     public function get(string $name): ?string
     {
-        $config = $this->entityManager->getRepository(PsmoduleblueprintConf::class)
-            ->findOneBy(['name' => $name]);
-        return $config ? $config->getValue() : null;
+        $this->assertName($name);
+        $config = $this->entityManager->getRepository(PsmoduleblueprintConf::class)->findOneBy(['name' => $name]);
+
+        return $config instanceof PsmoduleblueprintConf ? $config->getValue() : null;
     }
-    /**
-     * Set configuration value by name.
-     *
-     * @param string $name
-     * @param string $value
-     *
-     * @return void
-     */
+
     public function set(string $name, string $value): void
     {
-        $config = $this->entityManager->getRepository(PsmoduleblueprintConf::class)
-            ->findOneBy(['name' => $name]);
-        if (!$config) {
+        $this->assertName($name);
+        $this->assertValue($value);
+
+        $config = $this->entityManager->getRepository(PsmoduleblueprintConf::class)->findOneBy(['name' => $name]);
+        if (!$config instanceof PsmoduleblueprintConf) {
             $config = new PsmoduleblueprintConf();
             $config->setName($name);
         }
+
         $config->setValue($value);
         $this->entityManager->persist($config);
         $this->entityManager->flush();
     }
-    /**
-     * Remove configuration by name.
-     *
-     * @param string $name
-     * @return void
-     */
+
     public function remove(string $name): void
     {
-        $config = $this->entityManager->getRepository(PsmoduleblueprintConf::class)
-            ->findOneBy(['name' => $name]);
-        if ($config) {
+        $this->assertName($name);
+        $config = $this->entityManager->getRepository(PsmoduleblueprintConf::class)->findOneBy(['name' => $name]);
+        if ($config instanceof PsmoduleblueprintConf) {
             $this->entityManager->remove($config);
             $this->entityManager->flush();
+        }
+    }
+
+    private function assertName(string $name): void
+    {
+        if (!preg_match('/^[A-Za-z0-9_]{1,64}$/', $name)) {
+            throw new \InvalidArgumentException('Invalid configuration name.');
+        }
+    }
+
+    private function assertValue(string $value): void
+    {
+        if (strlen($value) > 255 || str_contains($value, "\0")) {
+            throw new \InvalidArgumentException('Invalid configuration value.');
         }
     }
 }
