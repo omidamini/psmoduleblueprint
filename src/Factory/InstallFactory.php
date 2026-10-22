@@ -5,34 +5,39 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Factory;
+
 use Blueprint\Module\Psmoduleblueprint\Install\Database\QueryManager;
 use Blueprint\Module\Psmoduleblueprint\Install\Hook\HookManager;
 use Blueprint\Module\Psmoduleblueprint\Install\Hook\HooksList;
 use Blueprint\Module\Psmoduleblueprint\Install\Installer;
 use Blueprint\Module\Psmoduleblueprint\Install\Tabmenu\MenusList;
-use Blueprint\Module\Psmoduleblueprint\Install\Tabmenu\TabMenuManger;
+use Blueprint\Module\Psmoduleblueprint\Install\Tabmenu\TabMenuManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Module;
-use Context;
 
+/**
+ * Composition root for the installer and its collaborators.
+ */
 class InstallFactory
 {
-    public function __construct(private Module $module, private Context $context)
+    public function __construct(private Module $module)
     {
-        
     }
-    public function create(string $installer): Installer
+
+    public function create(): Installer
     {
-        if (!class_exists($installer)) {
-            throw new \InvalidArgumentException('Installer class does not exist: ' . $installer);
+        $entityManager = $this->module->get('doctrine.orm.entity_manager');
+        if (!$entityManager instanceof EntityManagerInterface) {
+            throw new \RuntimeException('Doctrine entity manager is not available.');
         }
-        
-        return new $installer(
+
+        return new Installer(
             $this->module,
-            $this->context,
-            HookManager::getInstance($this->module, HooksList::class),
-            QueryManager::getInstance(),
-            TabMenuManger::getInstance($this->module->name, MenusList::class, $this->module->get('doctrine.orm.entity_manager') ?: null)
+            new HookManager($this->module, new HooksList()),
+            new QueryManager(),
+            new TabMenuManager($this->module->name, new MenusList(), $entityManager)
         );
     }
 }

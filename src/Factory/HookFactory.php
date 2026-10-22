@@ -5,41 +5,28 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Factory;
 
+use Blueprint\Module\Psmoduleblueprint\Hook\Hook;
 use Context;
 use Module;
 
+/**
+ * Factory Method: builds a hook object only when the class extends Hook.
+ */
 class HookFactory
 {
-    /**
-     * @var \Module
-     */
-    private Module $module;
-    /**
-     * @var \Context
-     */
-    private Context $context;
-    /**
-     * @var array
-     */
-    private array $additionalParams = [];
-    /**
-     * @param \Module $module
-     * @param \Context $context
-     * @param array $additionalParams
-     */
-    public function __construct(Module $module, Context $context, ...$additionalParams)
+    public function __construct(private Module $module, private Context $context)
     {
-        $this->module = $module;
-        $this->context = $context;
-        $this->additionalParams = $additionalParams;
     }
-    public function create(string $hookClassName): object
+
+    public function create(string $hookClassName): Hook
     {
-        if(!class_exists($hookClassName)) {
-            throw new \InvalidArgumentException('Hook class does not exist: ' . $hookClassName);
+        if (!is_subclass_of($hookClassName, Hook::class)) {
+            throw new \InvalidArgumentException('Hook class must extend ' . Hook::class . '.');
         }
-        return new $hookClassName($this->module, $this->context, ...$this->additionalParams);
+
+        return new $hookClassName($this->module, $this->context);
     }
 }

@@ -286,8 +286,14 @@ final class FileSystemHelper
         }
         
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo === false) {
+            return false;
+        }
         $mimeType = finfo_file($finfo, $filePath);
         finfo_close($finfo);
+        if (!is_string($mimeType)) {
+            return false;
+        }
         
         return strpos($mimeType, 'text') !== false || in_array($mimeType, self::TEXT_MIME_TYPES, true);
     }
@@ -386,7 +392,12 @@ final class ModuleRenamer
     
     public function __construct(string $baseDirectory = '.', array $excludedDirs = ['vendor', 'node_modules', '.git'])
     {
-        $this->baseDirectory = realpath($baseDirectory);
+        $resolvedDirectory = realpath($baseDirectory);
+        if ($resolvedDirectory === false || !is_dir($resolvedDirectory)) {
+            throw new \InvalidArgumentException('Directory not found.');
+        }
+
+        $this->baseDirectory = $resolvedDirectory;
         $this->excludedDirectories = $excludedDirs;
         $this->oldName = self::DEFAULT_OLD_NAME;
         $this->oldDisplayName = self::DEFAULT_OLD_DISPLAY_NAME;
@@ -430,23 +441,23 @@ final class ModuleRenamer
     private function promptForModuleName(): bool
     {
         echo ConsoleColor::info("Enter the new module name (e.g., my_new_module): ");
-        $input = trim(fgets(STDIN));
-        
-        if (empty($input)) {
-            echo ConsoleColor::error("Module name cannot be empty!\n");
+        $input = trim((string) fgets(STDIN));
+
+        if (!preg_match('/^[A-Za-z][A-Za-z0-9_]{1,50}$/', $input)) {
+            echo ConsoleColor::error("Module name must start with a letter and contain only letters, numbers, and underscores.\n");
             return false;
         }
-        
-        $this->newName = CaseConverter::toSnakeCase($input);
-        
+
+        $this->newName = strtolower($input);
+
         echo ConsoleColor::info("Enter the new display name (e.g., My New Module): ");
-        $displayInput = trim(fgets(STDIN));
-        
-        if (empty($displayInput)) {
-            echo ConsoleColor::error("Display name cannot be empty!\n");
+        $displayInput = trim((string) fgets(STDIN));
+
+        if (!preg_match('/^[\p{L}\p{N} ._-]{1,64}$/u', $displayInput)) {
+            echo ConsoleColor::error("Display name contains characters that are not allowed.\n");
             return false;
         }
-        
+
         $this->newDisplayName = $displayInput;
         $this->displayConversionPreview();
         
@@ -467,7 +478,7 @@ final class ModuleRenamer
         
         $variations = $this->getCaseVariations();
         foreach ($variations as $label => $variation) {
-            $padding = str_repeat(' ', 30 - strlen($variation['old']));
+            $padding = str_repeat(' ', max(1, 30 - strlen($variation['old'])));
             echo "  - {$variation['old']}{$padding}→ {$variation['new']}\n";
         }
         
@@ -677,6 +688,10 @@ final class ModuleRenamer
             }
             
             $newBasename = str_replace($variation['old'], $variation['new'], $basename);
+            if ($newBasename !== basename($newBasename) || str_contains($newBasename, '..')) {
+                echo ConsoleColor::error("  ✗ Refusing to rename outside the module directory: ") . $basename . "\n";
+                return $path;
+            }
             $newPath = $dirname . DIRECTORY_SEPARATOR . $newBasename;
             
             if ($this->performRename($path, $newPath, $basename, $newBasename)) {
@@ -694,6 +709,11 @@ final class ModuleRenamer
      */
     private function performRename(string $oldPath, string $newPath, string $oldName, string $newName): bool
     {
+        if (!$this->isInsideBase($oldPath) || !$this->isInsideBase(dirname($newPath))) {
+            echo ConsoleColor::error("  ✗ Refusing to rename outside the module directory: ") . $oldPath . "\n";
+            return false;
+        }
+
         if (rename($oldPath, $newPath)) {
             $this->statistics->incrementFilesRenamed();
             echo ConsoleColor::success("  ✓ Renamed: ") . "$oldName → $newName\n";
@@ -743,6 +763,11 @@ final class ModuleRenamer
             return;
         }
         
+        if (!$this->isInsideBase($filePath)) {
+            echo ConsoleColor::error("  ✗ Refusing to modify a file outside the module directory: ") . $filePath . "\n";
+            return;
+        }
+
         if (file_put_contents($filePath, $content) !== false) {
             $this->statistics->incrementFilesModified();
             $this->statistics->addReplacements($fileReplacements);
@@ -750,6 +775,22 @@ final class ModuleRenamer
         } else {
             echo ConsoleColor::error("  ✗ Failed to modify: ") . $filePath . "\n";
         }
+    }
+
+    private function isInsideBase(string $path): bool
+    {
+        $resolved = realpath($path);
+        if ($resolved === false) {
+            $resolved = realpath(dirname($path));
+            if ($resolved === false) {
+                return false;
+            }
+        }
+
+        $base = rtrim($this->baseDirectory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $candidate = rtrim($resolved, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+
+        return $candidate === $base || str_starts_with($candidate, $base);
     }
 }
 

@@ -1,4 +1,7 @@
 psmoduleblueprint_configure:
   path: /configure
-  controller: Blueprint\Module\Psmoduleblueprint\Controller\ModuleConfigController::configureAction
   methods: [GET, POST]
+  defaults:
+    _controller: Blueprint\Module\Psmoduleblueprint\Controller\ModuleConfigController::configureAction
+    _legacy_controller: AdminPsmoduleblueprintConfig
+    _legacy_link: AdminPsmoduleblueprintConfig

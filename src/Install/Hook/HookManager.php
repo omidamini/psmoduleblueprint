@@ -5,46 +5,42 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Install\Hook;
+
 use Module;
 
 class HookManager
 {
-    /**
-     * @var array
-     */
     private array $hooks;
 
-    /**
-     * @param Module $module
-     * @param HooksList $hooksList
-     */
-    public function __construct(private Module $module, private HooksList $hooksList)
+    public function __construct(private Module $module, HooksList $hooksList)
     {
         $this->hooks = $hooksList->getHooks();
     }
+
     public function registerHooks(): bool
     {
-        $hooks = $this->hooks;
-        foreach ($hooks as $hook) {
+        foreach ($this->hooks as $hook) {
+            if (!is_string($hook) || !preg_match('/^[A-Za-z0-9]+$/', $hook)) {
+                throw new \InvalidArgumentException('Invalid hook name.');
+            }
             if (!$this->module->registerHook($hook)) {
-                throw new \Exception('Failed to register hook : ' . $hook);
+                throw new \RuntimeException('Failed to register hook ' . $hook . '.');
             }
         }
+
         return true;
     }
+
     public function unregisterHooks(): bool
     {
-        $hooks = $this->hooks;
-        foreach ($hooks as $hook) {
-            if (!$this->module->unregisterHook($hook)) {
-                throw new \Exception('Failed to unregister hook : ' . $hook);
+        foreach ($this->hooks as $hook) {
+            if (is_string($hook)) {
+                $this->module->unregisterHook($hook);
             }
         }
+
         return true;
-    }
-    public static function getInstance(Module $module, string $hooksList): HookManager
-    {
-        return new self($module, new $hooksList());
     }
 }

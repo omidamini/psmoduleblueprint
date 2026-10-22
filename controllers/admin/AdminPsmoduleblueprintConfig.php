@@ -6,12 +6,18 @@
  */
 use Blueprint\Module\Psmoduleblueprint\Factory\HookFactory;
 use Blueprint\Module\Psmoduleblueprint\Hook\GetContentHook;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 class AdminPsmoduleblueprintConfigController extends ModuleAdminController
 {
     public function initContent()
     {
         parent::initContent();
-        return (new HookFactory($this->module, Context::getContext()))
+
+        (new HookFactory($this->module, $this->context))
             ->create(GetContentHook::class)
             ->run();
     }

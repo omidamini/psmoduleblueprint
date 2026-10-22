@@ -5,24 +5,21 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Hook;
+
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
-use Blueprint\Module\Psmoduleblueprint\Hook\Hook;
 use Tools;
 
 class GetContentHook extends Hook
 {
-    /**
-     * Execute the hook.
-     *
-     * @param array $params
-     * @return bool
-     */
-    public function run()
+    public function run(): void
     {
-        $sfContainer = SymfonyContainer::getInstance();
-        $router = $sfContainer->get('router');
-        $url = $router->generate('psmoduleblueprint_configure');
-        Tools::redirectAdmin($url);
+        $container = SymfonyContainer::getInstance();
+        if ($container === null || !$container->has('router')) {
+            throw new \RuntimeException('The configuration page is not available.');
+        }
+
+        Tools::redirectAdmin($container->get('router')->generate('psmoduleblueprint_configure'));
     }
 }

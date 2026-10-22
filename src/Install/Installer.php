@@ -5,89 +5,103 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Install;
-use Context;
+
 use Blueprint\Module\Psmoduleblueprint\Install\Database\CreateSchema;
 use Blueprint\Module\Psmoduleblueprint\Install\Database\DropSchema;
-use Module;
 use Blueprint\Module\Psmoduleblueprint\Install\Database\QueryManager;
 use Blueprint\Module\Psmoduleblueprint\Install\Hook\HookManager;
-use Blueprint\Module\Psmoduleblueprint\Install\Tabmenu\TabMenuManger;
+use Blueprint\Module\Psmoduleblueprint\Install\Tabmenu\TabMenuManager;
+use Module;
 
 final class Installer
 {
     public function __construct(
         private Module $module,
-        private Context $context,
         private HookManager $hookManager,
         private QueryManager $queryManager,
-        private TabMenuManger $tabMenuManger,
-
-    ) {}
+        private TabMenuManager $tabMenuManager,
+    ) {
+    }
 
     public function installHooks(): bool
     {
-        try 
-        {
-            $this->module->confirmation('Installing hooks');
-            return $this->hookManager->registerHooks();
-        } catch (\Throwable $th) {
-            $this->module->error('Error installing hooks.  File: ' . $th->getFile() . ' Line: ' . $th->getLine() . ' Message: ' . $th->getMessage());
+        try {
+            $this->hookManager->registerHooks();
+            $this->module->confirmation('Hooks installed.');
+
+            return true;
+        } catch (\Throwable $throwable) {
+            $this->module->logThrowable('Hook installation failed.', $throwable);
+
             return false;
         }
     }
 
     public function uninstallHooks(): bool
     {
-        try
-        {
-            $this->module->confirmation('Uninstalling hooks');
-            return $this->hookManager->unregisterHooks();
-        } catch (\Throwable $th) {
-            $this->module->error('Error uninstalling hooks.  File: ' . $th->getFile() . ' Line: ' . $th->getLine() . ' Message: ' . $th->getMessage());
+        try {
+            $this->hookManager->unregisterHooks();
+
+            return true;
+        } catch (\Throwable $throwable) {
+            $this->module->logThrowable('Hook removal failed.', $throwable);
+
             return false;
         }
     }
+
     public function installQueries(): bool
     {
         try {
-            $this->module->confirmation('Installing queries');
-            return $this->queryManager->executeQuery(CreateSchema::class);
-        } catch (\Throwable $th) {
-            $this->module->error('Error installing queries. File: ' . $th->getFile() . ' Line: ' . $th->getLine() . ' Message: ' . $th->getMessage());
+            $this->queryManager->execute(new CreateSchema());
+            $this->module->confirmation('Database installed.');
+
+            return true;
+        } catch (\Throwable $throwable) {
+            $this->module->logThrowable('Database installation failed.', $throwable);
+
             return false;
         }
     }
 
     public function uninstallQueries(): bool
     {
-        try 
-        {
-            $this->module->confirmation('Uninstalling queries');
-            return $this->queryManager->executeQuery(DropSchema::class);
-        } catch (\Throwable $th) {
-            $this->module->error('Error uninstalling queries.  File: ' . $th->getFile() . ' Line: ' . $th->getLine() . ' Message: ' . $th->getMessage());
+        try {
+            $this->queryManager->execute(new DropSchema());
+
+            return true;
+        } catch (\Throwable $throwable) {
+            $this->module->logThrowable('Database removal failed.', $throwable);
+
             return false;
         }
     }
+
     public function installTabMenus(): bool
     {
-        
         try {
-            $this->module->confirmation('Installing tab menu');
-            return $this->tabMenuManger->registerMenus();
-        } catch (\Throwable $th) {
-            $this->module->error('Error installing tab menu. File: ' . $th->getFile() . ' Line: ' . $th->getLine() . ' Message: ' . $th->getMessage());
+            $this->tabMenuManager->registerMenus();
+            $this->module->confirmation('Admin menu installed.');
+
+            return true;
+        } catch (\Throwable $throwable) {
+            $this->module->logThrowable('Admin menu installation failed.', $throwable);
+
             return false;
         }
     }
+
     public function uninstallTabMenu(): bool
     {
         try {
-            $this->module->confirmation('Uninstalling tab menu');
-            return $this->tabMenuManger->unregisterMenus();
-        } catch (\Throwable $th) {
-            $this->module->error('Error uninstalling tab menu. File: ' . $th->getFile() . ' Line: ' . $th->getLine() . ' Message: ' . $th->getMessage());
+            $this->tabMenuManager->unregisterMenus();
+
+            return true;
+        } catch (\Throwable $throwable) {
+            $this->module->logThrowable('Admin menu removal failed.', $throwable);
+
             return false;
         }
     }

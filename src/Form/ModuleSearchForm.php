@@ -5,6 +5,7 @@
  * @license OSL 3.0
  */
 declare(strict_types=1);
+
 namespace Blueprint\Module\Psmoduleblueprint\Form;
 
 use Symfony\Component\Form\AbstractType;
@@ -12,7 +13,10 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-class ModuleSearchForm  extends AbstractType
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
+
+class ModuleSearchForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -20,19 +24,26 @@ class ModuleSearchForm  extends AbstractType
             ->add('q', TextType::class, [
                 'label' => false,
                 'required' => false,
+                'constraints' => [
+                    new Length(['max' => 64]),
+                    new Regex(['pattern' => '/^[\p{L}\p{N} ._-]*$/u']),
+                ],
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Rechercher par nom, référence ou ID'
+                    'placeholder' => 'Search by name, reference or ID',
+                    'maxlength' => 64,
                 ],
             ])
-            ->add('rechercher', SubmitType::class, [
-                'label' => 'Rechercher',
+            ->add('search', SubmitType::class, [
+                'label' => 'Search',
                 'attr' => ['class' => 'btn btn-primary'],
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([]);
+        $resolver->setDefaults([
+            'csrf_protection' => true,
+        ]);
     }
 }
